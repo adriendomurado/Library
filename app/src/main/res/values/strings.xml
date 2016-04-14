@@ -4,7 +4,4 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="book_list">List of Books</string>
     <string name="cart">Cart</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

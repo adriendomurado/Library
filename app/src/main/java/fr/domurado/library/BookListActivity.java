@@ -31,7 +31,7 @@ import fr.domurado.library.bo.Book;
 
 public class BookListActivity extends AppCompatActivity {
 
-    public static final String TAG = "BookListActivity";
+    private static final String TAG = "BookListActivity";
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -77,9 +77,7 @@ public class BookListActivity extends AppCompatActivity {
         String listBookJson = null;
         try {
             listBookJson = new RequestTask().execute("http://henri-potier.xebia.fr/books").get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
         Log.d(TAG, listBookJson);
