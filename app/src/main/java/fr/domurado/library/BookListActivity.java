@@ -1,26 +1,37 @@
 package fr.domurado.library;
 
+import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.TextView;
+import com.google.gson.Gson;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
+import fr.domurado.library.bo.Book;
 
 public class BookListActivity extends AppCompatActivity {
 
+    public static final String TAG = "BookListActivity";
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -63,8 +74,18 @@ public class BookListActivity extends AppCompatActivity {
             }
         });*/
 
-    }
+        String listBookJson = null;
+        try {
+            listBookJson = new RequestTask().execute("http://henri-potier.xebia.fr/books").get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG, listBookJson);
 
+        Book[] books = new Gson().fromJson(listBookJson, Book[].class);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -120,7 +141,7 @@ public class BookListActivity extends AppCompatActivity {
             if (sectionNumber == 1) {
                 rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
             } else {
-                rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
+                rootView = inflater.inflate(R.layout.fragment_cart, container, false);
             }
 
             return rootView;
@@ -161,4 +182,39 @@ public class BookListActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    private class RequestTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... resources) {
+
+            URL url;
+            HttpURLConnection urlConnection = null;
+            InputStream in = null;
+            StringBuilder sb = new StringBuilder();
+            try {
+                url = new URL(resources[0]);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                in = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    sb.append(line).append("\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                urlConnection.disconnect();
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            return sb.toString();
+        }
+    }
+
 }
