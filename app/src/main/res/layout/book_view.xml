@@ -35,4 +35,11 @@
         android:layout_toEndOf="@+id/imgCover"
         android:text="Price"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:id="@+id/imageView"
+        android:layout_alignParentBottom="true"
+        android:background="@color/material_grey_300"/>
 </RelativeLayout>
