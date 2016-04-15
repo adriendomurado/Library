@@ -8,6 +8,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import fr.domurado.library.bo.Book;
 public class BookListActivity extends AppCompatActivity {
 
     private static final String TAG = "BookListActivity";
+    public Book[] mBooks;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -82,7 +85,7 @@ public class BookListActivity extends AppCompatActivity {
         }
         Log.d(TAG, listBookJson);
 
-        Book[] books = new Gson().fromJson(listBookJson, Book[].class);
+        mBooks = new Gson().fromJson(listBookJson, Book[].class);
     }
 
     @Override
@@ -116,6 +119,7 @@ public class BookListActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        private static Book[] mBooks;
 
         public PlaceholderFragment() {
         }
@@ -124,11 +128,12 @@ public class BookListActivity extends AppCompatActivity {
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
+        public static PlaceholderFragment newInstance(int sectionNumber, Book[] books) {
             PlaceholderFragment fragment = new PlaceholderFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            mBooks = books;
             return fragment;
         }
 
@@ -138,6 +143,10 @@ public class BookListActivity extends AppCompatActivity {
             View rootView;
             if (sectionNumber == 1) {
                 rootView = inflater.inflate(R.layout.fragment_book_list, container, false);
+                RecyclerView myRecyclerView = (RecyclerView) rootView.findViewById(R.id.book_list_recycler_view);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
+                myRecyclerView.setLayoutManager(layoutManager);
+                myRecyclerView.setAdapter(new BookListAdapter(mBooks));
             } else {
                 rootView = inflater.inflate(R.layout.fragment_cart, container, false);
             }
@@ -160,7 +169,7 @@ public class BookListActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            return PlaceholderFragment.newInstance(position + 1, mBooks);
         }
 
         @Override
